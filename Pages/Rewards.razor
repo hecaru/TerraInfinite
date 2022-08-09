@@ -1,0 +1,87 @@
+﻿@page "/rewards"
+@using System.Text.Json
+@using System.Globalization
+
+<PageTitle>Terra Infinite - Rewards Schedule</PageTitle>
+
+@if (!_metaMaskInstalled)
+{
+    <MudAlert Severity="Severity.Warning">
+        You need to download and install MetaMask from here: <MudLink Href="https://metamask.io/" Target="_blank" Typo="Typo.body2" Color="Color.Inherit"><b>https://metamask.io/</b></MudLink><br />
+        After installation, please <MudLink Href="javascript:document.location.reload(true);" Typo="Typo.body2" Color="Color.Inherit"><b>refresh</b></MudLink> the page!
+    </MudAlert>
+}
+else if (_rewards is null)
+{
+    <MudProgressCircular Class="mt-16" Color="Color.Primary" Indeterminate="true" />
+}
+else
+{
+    <MudText Typo="Typo.h3" GutterBottom="true">
+        Rewards Schedule
+    </MudText>
+
+    @if (_sortAscendenting)
+    {
+        <MudButton Class="mb-2" Color="Color.Default" Variant="Variant.Filled" StartIcon="@Icons.Filled.Refresh" OnClick="RefreshAsync">
+            Refresh
+        </MudButton>
+        <MudButton Class="mb-2" Color="Color.Primary" Variant="Variant.Filled" StartIcon="@Icons.Filled.ArrowDownward" OnClick="Reorder">
+            Newest First
+        </MudButton>
+    }
+    else
+    {
+        <MudButton Class="mb-2" Color="Color.Default" Variant="Variant.Filled" StartIcon="@Icons.Filled.Refresh" OnClick="RefreshAsync">
+            Refresh
+        </MudButton>
+        <MudButton Class="mb-2" Color="Color.Primary" Variant="Variant.Filled" StartIcon="@Icons.Filled.ArrowUpward" OnClick="Reorder">
+            Oldest First
+        </MudButton>
+    }
+
+    @foreach (KeyValuePair<DateTime, Dictionary<string, string>> reward in _rewards)
+    {
+        <MudTable Class="my-8" Items="reward.Value" Hover="true" Dense="true" Striped="false">
+            <ToolBarContent>
+                <MudText Typo="Typo.h6">Rewarded on</MudText>
+                <MudSpacer />
+                <MudChip Variant="Variant.Outlined">@reward.Key.ToString(CultureInfo.InvariantCulture)</MudChip>
+            </ToolBarContent>
+            <HeaderContent>
+                <MudTh>
+                    <MudTableSortLabel SortBy="new Func<KeyValuePair<string, string>, object>(context => context.Key)">Address</MudTableSortLabel>
+                </MudTh>
+                <MudTh>
+                    <MudTableSortLabel SortBy="new Func<KeyValuePair<string, string>, object>(context => Convert.ToDecimal(context.Value))">Rewards</MudTableSortLabel>
+                </MudTh>
+                <MudTh>
+                    Status
+                </MudTh>
+            </HeaderContent>
+            <RowTemplate>
+                <MudTd DataLabel="Address">
+                    @context.Key.Trim('~')
+                </MudTd>
+                <MudTd DataLabel="Rewards">@context.Value ETH</MudTd>
+                <MudTd DataLabel="Status">
+                    @if (reward.Key + _lockdownPeriod > _now)
+                    {
+                        <MudText Color="Color.Error">unlocks on @((reward.Key + _lockdownPeriod).ToString(CultureInfo.InvariantCulture))</MudText>
+                    }
+                    else if (context.Key.EndsWith('~'))
+                    {
+                        <MudText Color="Color.Success">withdrawn</MudText>
+                    }
+                    else
+                    {
+                        <MudText Color="Color.Primary">available</MudText>
+                    }
+                </MudTd>
+            </RowTemplate>
+            <PagerContent>
+                <MudTablePager />
+            </PagerContent>
+        </MudTable>
+    }
+}

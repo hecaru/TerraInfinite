@@ -1,0 +1,79 @@
+﻿@page "/"
+@using System.Globalization
+
+<PageTitle>Terra Infinite - Home</PageTitle>
+
+@if (!_metaMaskInstalled)
+{
+    <MudAlert Severity="Severity.Warning">
+        You need to download and install MetaMask from here: <MudLink Href="https://metamask.io/" Target="_blank" Typo="Typo.body2" Color="Color.Inherit"><b>https://metamask.io/</b></MudLink><br />
+        After installation, please <MudLink Href="javascript:document.location.reload(true);" Typo="Typo.body2" Color="Color.Inherit"><b>refresh</b></MudLink> the page!
+    </MudAlert>
+}
+else if (string.IsNullOrEmpty(_account))
+{
+    <MudProgressCircular Color="Color.Primary" Indeterminate="true" />
+}
+else
+{
+    <MudText Typo="Typo.h3" GutterBottom="true">
+        Account
+        @if (_isWhitelisted)
+        {
+            <MudChip Color="Color.Success">Whitelisted</MudChip>
+        }
+    </MudText>
+
+    <MudText>
+        Your address: <MudChip Variant="Variant.Outlined">@_account</MudChip>
+    </MudText>
+
+    <MudText>
+        Your balance: <MudChip Variant="Variant.Outlined">@_assetBalance LUNI</MudChip> with <MudChip Variant="Variant.Outlined">@_stake stake</MudChip>
+    </MudText>
+
+    <MudText>
+        <MudLink Href="javascript:window.watchAsset()">
+            Add to MetaMask
+        </MudLink>
+    </MudText>
+
+    <MudNumericField Class="mt-8" Label="@($"Invest (max {_ethBalance} ETH):")" HelperText="@($"You will receive: {_assetAfterInvestment} LUNI")" @bind-Value="EthAmountToInvest" Variant="Variant.Text" Step=".0001M" />
+
+    <MudButton Class="my-2" Color="Color.Primary" Variant="Variant.Filled" StartIcon="@Icons.Filled.CreditCard" OnClick="InvestAsync">
+        Invest
+    </MudButton>
+    <MudButton Class="my-2" Color="Color.Default" Variant="Variant.Filled" StartIcon="@Icons.Filled.Refresh" OnClick="RefreshAsync">
+        Refresh
+    </MudButton>
+
+
+
+
+    <MudText Class="mt-12" Typo="Typo.h3" GutterBottom="true">
+        Rewards
+    </MudText>
+
+    <MudText>
+        Total rewards (including locked): <MudChip Variant="Variant.Outlined">@_remainingReward ETH</MudChip>
+    </MudText>
+
+    <MudText>
+        Available for withdraw: <MudChip Variant="Variant.Outlined">@_availableReward ETH</MudChip>
+    </MudText>
+
+    <MudText>
+        Next reward unlock: <MudChip Variant="Variant.Outlined">@(_nextRewardUnlock?.ToString(CultureInfo.InvariantCulture) ?? "never")</MudChip>
+        </MudText>
+
+    <MudButton Class="my-2" Color="Color.Primary" Variant="Variant.Filled" StartIcon="@Icons.Filled.CurrencyExchange" OnClick="ReinvestRewardAsync">
+        Reinvest
+    </MudButton>
+    <MudButton Class="my-2" Color="Color.Error" Variant="Variant.Filled" StartIcon="@Icons.Filled.AttachMoney" OnClick="WithdrawRewardAsync">
+        Withdraw
+    </MudButton>
+
+    <MudText>
+        Withdrawn rewards (until now): <MudChip Variant="Variant.Outlined">@_withdrawnReward ETH</MudChip>
+    </MudText>
+}

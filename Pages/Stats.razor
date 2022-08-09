@@ -1,0 +1,76 @@
+﻿@page "/stats"
+
+<PageTitle>Terra Infinite - Statistics</PageTitle>
+
+@if (!_metaMaskInstalled)
+{
+    <MudAlert Severity="Severity.Warning">
+        You need to download and install MetaMask from here: <MudLink Href="https://metamask.io/" Target="_blank" Typo="Typo.body2" Color="Color.Inherit"><b>https://metamask.io/</b></MudLink><br />
+        After installation, please <MudLink Href="javascript:document.location.reload(true);" Typo="Typo.body2" Color="Color.Inherit"><b>refresh</b></MudLink> the page!
+    </MudAlert>
+}
+else if (string.IsNullOrEmpty(_totalSupply))
+{
+    <MudProgressCircular Class="mt-16" Color="Color.Primary" Indeterminate="true" />
+}
+else
+{
+    <MudText Typo="Typo.h3" GutterBottom="true">
+        LUNI Token
+    </MudText>
+
+    <MudText>
+        Smart Contract: <MudChip Variant="Variant.Outlined">@_contractAddress</MudChip>
+    </MudText>
+
+    <MudText>
+        Total LUNI Supply: <MudChip Variant="Variant.Outlined">@_totalSupply LUNI</MudChip>
+    </MudText>
+
+    <MudText>
+        Held by: <MudChip Variant="Variant.Outlined">@_holdersLength addresses</MudChip>
+    </MudText>
+
+    <MudText>
+        Invest rate: <MudChip Variant="Variant.Outlined">1 ETH = @_investRate LUNI</MudChip>
+    </MudText>
+
+    <MudButton Class="my-2" Color="Color.Primary" Variant="Variant.Filled" StartIcon="@Icons.Filled.Link" OnClick="ViewOnEtherscanAsync">
+        View on etherscan.io
+    </MudButton>
+    <MudButton Class="my-2" Color="Color.Default" Variant="Variant.Filled" StartIcon="@Icons.Filled.Refresh" OnClick="RefreshAsync">
+        Refresh
+    </MudButton>
+
+
+
+    <MudText Class="mt-12" Typo="Typo.h3" GutterBottom="true">
+        Liquidity Pool
+    </MudText>
+
+    <MudText>
+        Current LP fee: <MudChip Variant="Variant.Outlined">@_lpFee%</MudChip>
+    </MudText>
+
+    <MudText>
+        Current LP amount: <MudChip Variant="Variant.Outlined">@_liquidityPool ETH</MudChip>
+    </MudText>
+
+
+
+    <MudText Class="mt-12" Typo="Typo.h3" GutterBottom="true">
+        Rewards
+    </MudText>
+
+    <MudText>
+        Lockdown period: <MudChip Variant="Variant.Outlined">@string.Format("{0:%d} days, {0:%h} hours, {0:%m} minutes and {0:%s} seconds", _lockdownPeriod)</MudChip>
+    </MudText>
+
+    <MudText>
+        Whitelisted (no LP fee applied to rewards): <MudChip Variant="Variant.Outlined">@_whitelistedLength addresses</MudChip>
+    </MudText>
+
+    <MudText>
+        Distribution events: <MudChip Variant="Variant.Outlined">@_rewardsTimestampsLength events</MudChip>
+    </MudText>
+}

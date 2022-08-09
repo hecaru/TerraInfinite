@@ -1,0 +1,1 @@
+@remixd --shared-folder .

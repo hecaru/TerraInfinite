@@ -1,0 +1,83 @@
+﻿@page "/holders"
+@using System.Text.Json
+
+<PageTitle>Terra Infinite - Holders</PageTitle>
+
+@if (!_metaMaskInstalled)
+{
+    <MudAlert Severity="Severity.Warning">
+        You need to download and install MetaMask from here: <MudLink Href="https://metamask.io/" Target="_blank" Typo="Typo.body2" Color="Color.Inherit"><b>https://metamask.io/</b></MudLink><br />
+        After installation, please <MudLink Href="javascript:document.location.reload(true);" Typo="Typo.body2" Color="Color.Inherit"><b>refresh</b></MudLink> the page!
+    </MudAlert>
+}
+else if (_whitelisted is null)
+{
+    <MudProgressCircular Class="mt-16" Color="Color.Primary" Indeterminate="true" />
+}
+else
+{
+    <MudTable Items="_whitelisted" Hover="true" Dense="true" Striped="false" SortLabel="Sort By">
+        <ToolBarContent>
+            <MudText Typo="Typo.h6">Whitelisted (no LP fee applied to rewards)</MudText>
+            <MudSpacer />
+            <MudButton Class="my-2" Color="Color.Default" Variant="Variant.Filled" StartIcon="@Icons.Filled.Refresh" OnClick="RefreshAsync">
+                Refresh
+            </MudButton>
+        </ToolBarContent>
+        <HeaderContent>
+            <MudTh>
+                <MudTableSortLabel SortBy="new Func<string, object>(x => x)">Address</MudTableSortLabel>
+            </MudTh>
+        </HeaderContent>
+        <RowTemplate>
+            <MudTd DataLabel="Address">@context</MudTd>
+        </RowTemplate>
+        <PagerContent>
+            <MudTablePager />
+        </PagerContent>
+    </MudTable>
+
+
+
+    <MudTable Class="mt-16" Items="_holders" Hover="true" Dense="true" Striped="false">
+        <ToolBarContent>
+            <MudText Typo="Typo.h6">Holders</MudText>
+            <MudSpacer />
+            <MudButton Class="my-2" Color="Color.Default" Variant="Variant.Filled" StartIcon="@Icons.Filled.Refresh" OnClick="RefreshAsync">
+                Refresh
+            </MudButton>
+        </ToolBarContent>
+        <HeaderContent>
+            <MudTh>
+                <MudTableSortLabel SortBy="new Func<KeyValuePair<string, string>, object>(context => context.Key)">Address</MudTableSortLabel>
+            </MudTh>
+            <MudTh>
+                <MudTableSortLabel SortBy="new Func<KeyValuePair<string, string>, object>(context => _stake![context.Key])">Whitelisted</MudTableSortLabel>
+            </MudTh>
+            <MudTh>
+                <MudTableSortLabel SortBy="new Func<KeyValuePair<string, string>, object>(context => Convert.ToDecimal(context.Value))">Balance</MudTableSortLabel>
+            </MudTh>
+            <MudTh>
+                <MudTableSortLabel SortBy="new Func<KeyValuePair<string, string>, object>(context => Convert.ToDecimal(context.Value))">Stake</MudTableSortLabel>
+            </MudTh>
+        </HeaderContent>
+        <RowTemplate>
+            <MudTd DataLabel="Address">@context.Key</MudTd>
+            <MudTd DataLabel="Whitelisted">
+                @if(_whitelisted.Contains(context.Key))
+                {
+                    <MudText Color="Color.Success">Yes</MudText>
+                }
+                else
+                {
+                    <MudText Color="Color.Error">No</MudText>
+                }
+            </MudTd>
+            <MudTd DataLabel="Balance">@context.Value LUNI</MudTd>
+            <MudTd DataLabel="Stake">@_stake![context.Key]</MudTd>
+        </RowTemplate>
+        <PagerContent>
+            <MudTablePager />
+        </PagerContent>
+    </MudTable>
+}
